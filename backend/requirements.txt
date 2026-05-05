@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+motor
+python-jose
+passlib[bcrypt]
+pydantic
+python-dotenv
+web3
+geopy
+httpx
+pydantic-settings
