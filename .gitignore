@@ -40,6 +40,7 @@ share/python-wheels/
 .vscode/
 *.swp
 *.swo
+node_modules/
 
 # Logs
 logs/
