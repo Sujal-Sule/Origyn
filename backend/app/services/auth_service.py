@@ -29,4 +29,28 @@ async def authenticate_user(phone, password):
         raise HTTPException(status_code=400, detail="Invalid credentials")
     
     token = create_access_token({"sub": str(user["_id"])})
-    return {"access_token": token, "token_type": "bearer"}
+    # Remove hashed password before returning
+    user_copy = user.copy()
+    user_copy.pop("hashed_password")
+    user_copy["id"] = str(user_copy.pop("_id"))
+    return {"access_token": token, "token_type": "bearer", "user": user_copy}
+
+async def get_user_by_id(user_id: str):
+    from bson import ObjectId
+    user = await db["users"].find_one({"_id": ObjectId(user_id)})
+    if user:
+        user["id"] = str(user.pop("_id"))
+        user.pop("hashed_password")
+    return user
+
+async def reset_user_password(phone: str, new_password: str):
+    user = await db["users"].find_one({"phone": phone})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    hashed = get_password_hash(new_password)
+    await db["users"].update_one(
+        {"phone": phone},
+        {"$set": {"hashed_password": hashed}}
+    )
+    return {"msg": "Password updated successfully"}

@@ -152,3 +152,6 @@ async def update_product_stage(product_id: str, data, user_id):
 
 async def get_product(product_id: str):
     return await db["products"].find_one({"product_id": product_id}, {"_id": 0})
+
+async def get_user_products(user_id: str):
+    return await db["products"].find({"creator_id": user_id}).sort("created_at", -1).to_list(length=100)
