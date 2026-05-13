@@ -90,7 +90,7 @@ export const WalletScreen = () => {
             </TouchableOpacity>
             <TouchableOpacity 
               className="bg-navy-900 py-3 px-6 rounded-full flex-row items-center justify-center flex-1 ml-2 border border-white/10"
-              onPress={() => Alert.alert('Your Wallet Address', user?.wallet_address || '0xUNKNOWN')}
+              onPress={() => Alert.alert('Your Wallet Address', (user as any)?.wallet_address || '0xUNKNOWN')}
             >
               <ArrowDownRight color="#fff" size={20} />
               <Text className="text-white font-bold ml-2">Receive</Text>
