@@ -154,4 +154,22 @@ async def get_product(product_id: str):
     return await db["products"].find_one({"product_id": product_id}, {"_id": 0})
 
 async def get_user_products(user_id: str):
-    return await db["products"].find({"creator_id": user_id}).sort("created_at", -1).to_list(length=100)
+    from bson import ObjectId  # type: ignore
+    # Find all product IDs where the user was a stakeholder in an event
+    events = await db["events"].find({"stakeholder_id": user_id}).to_list(length=None)
+    
+    # Find all product IDs where the user has scanned it
+    try:
+        scans = await db["scans"].find({"user_id": ObjectId(user_id)}).to_list(length=None)
+    except:
+        scans = []
+        
+    product_ids_from_events = list(set([e["product_id"] for e in events] + [s["product_id"] for s in scans]))
+    
+    query = {
+        "$or": [
+            {"creator_id": user_id},
+            {"product_id": {"$in": product_ids_from_events}}
+        ]
+    }
+    return await db["products"].find(query).sort("created_at", -1).to_list(length=100)

@@ -1,6 +1,6 @@
 from app.core.database import db
 from datetime import datetime
-from bson import ObjectId
+from bson import ObjectId  # type: ignore
 from app.services.trust_score_service import calculate_trust_score
 
 async def verify_scan(qr_data: str):
@@ -55,7 +55,8 @@ async def process_consumer_scan(user_id: str, data: dict):
                 "$inc": {"token_balance": tokens_earned, "tokens": tokens_earned},
                 "$push": {"token_history": {
                     "amount": tokens_earned,
-                    "reason": f"Scanned {product_id}",
+                    "reason": f"Scanned {prod.get('name', 'Product')}",
+                    "product_id": product_id,
                     "timestamp": datetime.utcnow()
                 }}
             }
